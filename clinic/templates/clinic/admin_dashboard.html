@@ -1,0 +1,116 @@
+{% extends 'clinic/base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <h2 class="display-6 fw-bold mb-5" style="color: #2C3E50;">Admin Overview</h2>
+    
+    <div class="row g-5 mb-5">
+        
+        <div class="col-lg-3 col-md-6">
+            <a href="{% url 'user_list' %}" class="text-decoration-none">
+                <div class="card card-hover h-100 shadow-lg">
+                    <div class="card-body p-4 position-relative">
+                        <i class="bi-people card-icon position-absolute top-0 end-0 me-3 mt-3 stat-icon"></i>
+                        <div class="d-flex flex-column">
+                            <small class="text-muted text-uppercase fw-bold">Total Users</small>
+                            <h3 class="mt-2 display-5 fw-bolder" style="color: #2C3E50;">{{ total_users }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <a href="{% url 'patient_list' %}" class="text-decoration-none">
+                <div class="card card-hover h-100 shadow-lg">
+                    <div class="card-body p-4 position-relative">
+                        <i class="bi-person-lines-fill card-icon position-absolute top-0 end-0 me-3 mt-3 text-success stat-icon"></i>
+                        <div class="d-flex flex-column">
+                            <small class="text-muted text-uppercase fw-bold">Total Patients</small>
+                            <h3 class="mt-2 display-5 fw-bolder text-success">{{ total_patients }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <a href="{% url 'doctor_list' %}" class="text-decoration-none">
+                <div class="card card-hover h-100 shadow-lg">
+                    <div class="card-body p-4 position-relative">
+                        <i class="bi-person-badge card-icon position-absolute top-0 end-0 me-3 mt-3 text-warning stat-icon"></i>
+                        <div class="d-flex flex-column">
+                            <small class="text-muted text-uppercase fw-bold">Total Doctors</small>
+                            <h3 class="mt-2 display-5 fw-bolder text-warning">{{ total_doctors }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <a href="{% url 'appointment_list' %}" class="text-decoration-none">
+                <div class="card card-hover h-100 shadow-lg">
+                    <div class="card-body p-4 position-relative">
+                        <i class="bi-calendar-check card-icon position-absolute top-0 end-0 me-3 mt-3 stat-icon" style="color: #1ABC9C !important;"></i>
+                        <div class="d-flex flex-column">
+                            <small class="text-muted text-uppercase fw-bold">Total Appointments</small>
+                            <h3 class="mt-2 display-5 fw-bolder" style="color: #1ABC9C;">{{ total_appointments }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        </div>
+
+    <div class="card shadow-lg rounded-4 mt-5">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center p-4">
+            <h5 class="fw-bold mb-0" style="color: #2C3E50;">Recent Appointments</h5>
+            <a href="{% url 'appointment_list' %}" class="btn btn-sm btn-outline-secondary" style="border-color: #2C3E50; color: #2C3E50;">View All</a>
+        </div>
+        <div class="table-responsive">
+            {% if recent_appointments %}
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background-color: #ECF0F1;">
+                    <tr>
+                        <th class="p-3">Patient</th>
+                        <th class="p-3">Doctor</th>
+                        <th class="p-3">Date & Time</th>
+                        <th class="p-3">Status</th>
+                        <th class="p-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in recent_appointments|slice:":10" %}
+                    <tr>
+                        <td class="p-3 fw-bold">{{ appointment.patient.user.username|capfirst }}</td>
+                        <td class="p-3">{{ appointment.doctor.user.username|capfirst }}</td>
+                        <td class="p-3">{{ appointment.date }} {{ appointment.time }}</td>
+                        <td class="p-3">
+    {% with status_lower=appointment.status|lower %}
+        {% if status_lower == 'pending' %}
+            <span class="badge-status status-pending">Pending</span>
+        {% elif status_lower == 'completed' %}
+            <span class="badge-status status-completed">Completed</span>
+        {% elif status_lower == 'cancelled' %}
+            <span class="badge-status status-cancelled">Cancelled</span>
+        {% else %}
+            {{ appointment.status|capfirst }}
+        {% endif %}
+    {% endwith %}
+</td>
+                        <td class="p-3">
+                            <a href="{% url 'appointment_detail' appointment.id %}" class="btn btn-sm btn-success text-white">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted p-4 mb-0">No recent appointments found in the system.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

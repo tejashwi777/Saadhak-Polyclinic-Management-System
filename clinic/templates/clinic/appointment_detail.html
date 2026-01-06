@@ -1,0 +1,149 @@
+{% extends 'clinic/base.html' %}
+{% load static %}
+
+{% block title %}Appointment #{{ appointment.id }} Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4 display-6 fw-bold" style="color: #2C3E50;">Appointment Details</h2>
+
+    <div class="row g-4">
+        
+        <div class="col-lg-8">
+            <div class="card shadow-lg rounded-3 h-100">
+                <div class="card-header bg-white border-bottom p-4">
+                    <h5 class="fw-bold mb-0" style="color: #1ABC9C;"><i class="bi bi-calendar-check me-2"></i>Appointment #{{ appointment.id }}</h5>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <p class="text-muted mb-0 small">Date & Time</p>
+                            <h4 class="fw-bold">{{ appointment.date|date:"F d, Y" }} at {{ appointment.time|time:"h:i A" }}</h4>
+                        </div>
+                        <div class="col-md-6 mb-3 text-end">
+                            <p class="text-muted mb-0 small">Status</p>
+                            <h3>
+                                {% if appointment.status == "pending" %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% elif appointment.status == "confirmed" %}
+                                    <span class="badge bg-success text-white">Confirmed</span>
+                                {% elif appointment.status == "cancelled" %}
+                                    <span class="badge bg-danger text-white">Cancelled</span>
+                                {% elif appointment.status == "completed" %}
+                                    <span class="badge bg-secondary text-white">Completed</span>
+                                {% else %}
+                                    <span class="badge bg-info text-white">Draft</span>
+                                {% endif %}
+                            </h3>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6 mb-4">
+                            <h5 class="fw-bold" style="color: #2C3E50;"><i class="bi bi-person me-2"></i>Patient Details</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Name:</strong> {{ appointment.patient.user.get_full_name|default:appointment.patient.user.username }}</li>
+                                <li class="list-group-item"><strong>Email:</strong> {{ appointment.patient.user.email }}</li>
+                                <li class="list-group-item"><strong>Phone:</strong> {{ appointment.patient.phone|default:'N/A' }}</li> 
+                            </ul>
+                            <a href="{% url 'patient_detail' appointment.patient.id %}" class="btn btn-sm btn-outline-info mt-3">View Patient Profile</a>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <h5 class="fw-bold" style="color: #2C3E50;"><i class="bi bi-person-badge me-2"></i>Doctor Details</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Name:</strong> Dr. {{ appointment.doctor.user.get_full_name|default:appointment.doctor.user.username }}</li>
+                                <li class="list-group-item"><strong>Specialization:</strong> {{ appointment.doctor.specialization|default:'N/A' }}</li> 
+                                <li class="list-group-item"><strong>Email:</strong> {{ appointment.doctor.user.email }}</li>
+                            </ul>
+                            <a href="{% url 'doctor_detail' appointment.doctor.id %}" class="btn btn-sm btn-outline-info mt-3">View Doctor Profile</a>
+                        </div>
+                    </div>
+                    
+                    {% if appointment.symptoms %}
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <p class="fw-bold mb-1"><i class="bi bi-chat-text me-2"></i>Reason for Appointment (Symptoms):</p>
+                        <p class="mb-0">{{ appointment.symptoms }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-lg rounded-3">
+                <div class="card-header bg-white border-bottom p-3">
+                    <h5 class="fw-bold mb-0" style="color: #2C3E50;"><i class="bi bi-gear me-2"></i>Actions</h5>
+                </div>
+                <div class="card-body p-4">
+                    
+{% if user.role == 'receptionist' or user.role == 'admin' or user.id == appointment.doctor.user.id %}
+    
+    <p class="fw-bold text-muted small mt-2 mb-2">Update Status:</p>
+
+    {% if appointment.status != 'cancelled' and appointment.status != 'completed' %}
+        
+        {% if user.id == appointment.doctor.user.id %}
+        <div class="d-grid gap-2 mb-3">
+            <a href="{% url 'prescription_create' appointment_pk=appointment.id %}" class="btn btn-success w-100 btn-lg">
+                WRITE PRESCRIPTION
+            </a>
+        </div>
+        <hr>
+        {% endif %}
+
+        
+
+        {% if appointment.status != 'pending' %}
+    <a href="{% url 'update_appointment_status' appointment.id 'pending' %}" class="btn btn-warning w-100 mb-2 text-dark"
+        onclick="return confirm('Are you sure you want to set this appointment status back to Pending?');">
+        <i class="bi bi-arrow-clockwise me-2"></i> Keep Pending
+    </a>
+{% endif %}
+
+{% if appointment.status != 'confirmed' %}
+    <a href="{% url 'update_appointment_status' appointment.id 'confirmed' %}" class="btn btn-success w-100 mb-2 text-white">
+        <i class="bi bi-check-circle me-2"></i> Confirm Appointment
+    </a>
+{% endif %}
+
+{% if appointment.status == 'confirmed' and user.role != 'receptionist' %}
+    <a href="{% url 'update_appointment_status' appointment.id 'completed' %}" class="btn btn-secondary w-100 mb-2 text-white">
+        <i class="bi bi-patch-check me-2"></i> Mark as Completed
+    </a>
+{% endif %}
+
+<a href="{% url 'update_appointment_status' appointment.id 'cancelled' %}" class="btn btn-danger w-100 mb-3">
+    <i class="bi bi-x-octagon me-2"></i> Cancel Appointment
+</a>
+{% endif %}
+    {% if user.role == 'receptionist' or user.role == 'admin' %}
+        <hr>
+        <a href="{% url 'edit_appointment' appointment.id %}" class="btn btn-outline-primary w-100 mb-2">
+            <i class="bi bi-pencil me-2"></i> Edit Details
+        </a>
+        <a href="{% url 'delete_appointment' appointment.id %}" class="btn btn-outline-danger w-100"
+            onclick="return confirm('WARNING: Are you sure you want to permanently delete this appointment?');">
+            <i class="bi bi-trash me-2"></i> Delete Appointment
+        </a>
+    {% endif %}
+
+
+{% elif user.role == 'patient' and appointment.status == 'pending' %}
+    <p class="text-muted small">You can only cancel pending appointments.</p>
+    <a href="{% url 'update_appointment_status' appointment.id 'cancelled' %}" class="btn btn-warning w-100 mb-2 text-dark">
+        <i class="bi bi-x-octagon me-2"></i> Cancel My Appointment
+    </a>
+{% else %}
+    <p class="text-muted small">No status actions available at this time.</p>
+{% endif %}
+                
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

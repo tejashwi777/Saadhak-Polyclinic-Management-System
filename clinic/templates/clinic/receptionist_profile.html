@@ -1,0 +1,38 @@
+{% extends 'clinic/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-0">👩‍💼 {{ title }}</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h4 class="text-primary mb-3">Personal Details</h4>
+            
+            <p><strong>Name:</strong> {{ user_data.first_name }} {{ user_data.last_name }}</p>
+            <p><strong>Username:</strong> {{ user_data.username }}</p>
+            <p><strong>Email:</strong> {{ user_data.email }}</p>
+            <p><strong>Role:</strong> <span class="badge bg-info">{{ user_data.role|capfirst }}</span></p>
+
+            {# The views.py file for the Receptionist might need to pass in the receptionist_data object if you have one linked to the User model. Adjust below if needed. #}
+            {% comment %} 
+            {% if receptionist_data %}
+            <hr>
+            <h4 class="text-primary mb-3 mt-3">Contact Details</h4>
+            <p><strong>Phone:</strong> {{ receptionist_data.phone_number|default:"N/A" }}</p>
+            {% endif %}
+            {% endcomment %}
+
+            <div class="mt-4">
+                <a href="#" class="btn btn-warning">Edit Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

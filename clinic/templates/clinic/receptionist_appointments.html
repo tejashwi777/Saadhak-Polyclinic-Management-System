@@ -1,0 +1,94 @@
+{% extends 'clinic/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Appointments</h2>
+
+    <!-- Calendar -->
+    <div id="calendar" class="mb-5"></div>
+
+    <!-- Table fallback for all appointments -->
+    <h3>All Appointments</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in appointments %}
+                <tr>
+                    <td>{{ a.patient.user.get_full_name|default:a.patient.user.username }}</td>
+                    <td>{{ a.doctor.user.get_full_name|default:a.doctor.user.username }}</td>
+                    <td>{{ a.date }}</td>
+                    <td>{{ a.time }}</td>
+                    <td>
+                        <span class="badge {% if a.status == 'pending' %}bg-warning{% elif a.status == 'completed' %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ a.status|capfirst }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'appointment_detail' a.id %}" class="btn btn-sm btn-primary">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No appointments found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- FullCalendar CSS/JS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+
+<!-- Prepare appointments JSON safely -->
+<script id="appointments-data" type="application/json">
+[
+    {% for a in appointments %}
+    {
+        "title": "{{ a.patient.user.get_full_name|default:a.patient.user.username }} - {{ a.doctor.user.get_full_name|default:a.doctor.user.username }}",
+        "start": "{{ a.date }}T{{ a.time|time:'H:i:s' }}",
+        "url": "{% url 'appointment_detail' a.id %}",
+        "color": "{% if a.status == 'pending' %}#ffc107{% elif a.status == 'completed' %}#28a745{% else %}#dc3545{% endif %}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+]
+</script>
+
+<!-- Initialize FullCalendar -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var appointments = JSON.parse(document.getElementById('appointments-data').textContent);
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: appointments,
+        eventClick: function(info) {
+            if (info.event.url) {
+                window.location.href = info.event.url;
+                info.jsEvent.preventDefault();
+            }
+        }
+    });
+
+    calendar.render();
+});
+</script>
+{% endblock %}

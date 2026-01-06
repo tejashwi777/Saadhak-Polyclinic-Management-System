@@ -1,0 +1,20 @@
+<h2>Billing List</h2>
+
+<a href="{% url 'billing_create' %}">Create New Bill</a>
+
+<table border="1">
+    <tr>
+        <th>Patient</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Date</th>
+    </tr>
+    {% for bill in bills %}
+    <tr>
+        <td>{{ bill.patient }}</td>
+        <td>{{ bill.total_amount }}</td>
+        <td>{{ bill.payment_status }}</td>
+        <td>{{ bill.created_at }}</td>
+    </tr>
+    {% endfor %}
+</table>

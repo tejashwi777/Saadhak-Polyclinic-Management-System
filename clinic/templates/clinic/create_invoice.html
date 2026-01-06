@@ -1,0 +1,117 @@
+{% extends 'clinic/base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4>Create Invoice</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Patient</label>
+                        {{ invoice_form.patient|add_class:"form-select" }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Appointment</label>
+                        {{ invoice_form.appointment|add_class:"form-select" }}
+                    </div>
+                </div>
+
+                <h5>Invoice Items</h5>
+                {{ formset.management_form }}
+                <table class="table table-bordered" id="invoice-items-table">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for form in formset %}
+                        <tr class="form-row">
+                            <td>{{ form.description|add_class:"form-control" }}</td>
+                            <td>{{ form.amount|add_class:"form-control amount-field" }}</td>
+                            <td>
+                                {{ form.DELETE }}
+                                <button type="button" class="btn btn-danger btn-sm remove-row-btn">–</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="1" class="text-end">Total:</th>
+                            <th id="invoice-total">0.00</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <button type="button" class="btn btn-secondary mb-3" id="add-item-btn">+ Add Item</button>
+                <br>
+                <button type="submit" class="btn btn-success">Save Invoice</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let addBtn = document.getElementById("add-item-btn");
+    let tableBody = document.getElementById("invoice-items-table").getElementsByTagName('tbody')[0];
+    let totalForms = document.querySelector("#id_form-TOTAL_FORMS");
+    let totalCell = document.getElementById("invoice-total");
+
+    function updateTotal() {
+        let total = 0;
+        document.querySelectorAll(".amount-field").forEach(function(input) {
+            let val = parseFloat(input.value) || 0;
+            total += val;
+        });
+        totalCell.textContent = total.toFixed(2);
+    }
+
+    document.querySelectorAll(".amount-field").forEach(function(input) {
+        input.addEventListener("input", updateTotal);
+    });
+
+    addBtn.addEventListener("click", function() {
+        let formIdx = parseInt(totalForms.value);
+        let newRow = document.createElement("tr");
+        newRow.classList.add("form-row");
+        newRow.innerHTML = `
+            <td><input type="text" name="form-${formIdx}-description" class="form-control" /></td>
+            <td><input type="number" step="0.01" name="form-${formIdx}-amount" class="form-control amount-field" /></td>
+            <td>
+                <input type="checkbox" name="form-${formIdx}-DELETE" style="display:none;" />
+                <button type="button" class="btn btn-danger btn-sm remove-row-btn">–</button>
+            </td>
+        `;
+        tableBody.appendChild(newRow);
+        totalForms.value = formIdx + 1;
+
+        newRow.querySelector(".remove-row-btn").addEventListener("click", function() {
+            tableBody.removeChild(newRow);
+            updateTotal();
+        });
+
+        newRow.querySelector(".amount-field").addEventListener("input", updateTotal);
+    });
+
+    document.querySelectorAll(".remove-row-btn").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            let row = btn.closest("tr");
+            row.querySelector("input[type=checkbox]").checked = true;
+            row.style.display = "none";
+            updateTotal();
+        });
+    });
+
+    updateTotal();
+});
+</script>
+{% endblock %}

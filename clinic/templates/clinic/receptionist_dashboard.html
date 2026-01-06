@@ -1,0 +1,156 @@
+{% extends 'clinic/base.html' %}
+{% load static %}
+
+{% block title %}Receptionist Dashboard{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Styling for the Modern Cards */
+    .card-dashboard {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    .card-dashboard:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Specific Colors for Modern Cards */
+    .card-patients { border-color: #3498DB !important; }
+    .card-appointments { border-color: #1ABC9C !important; }
+    .card-today { border-color: #F39C12 !important; }
+    .card-invoices { border-color: #E74C3C !important; }
+
+    /* Fix for the Action Button in the Table (Ensures text visibility) */
+    .table-responsive .btn-info {
+        background-color: #3498DB; /* Use a consistent blue for info */
+        border-color: #3498DB;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4 display-6 fw-bold" style="color: #2C3E50;">Receptionist Dashboard</h2>
+
+    {# --- MODERNIZED CARD SECTION --- #}
+    <div class="row g-4 mb-5">
+        
+        <div class="col-lg-3 col-md-6">
+            <a href="{% url 'patient_list' %}" class="text-decoration-none">
+                <div class="card card-hover card-dashboard h-100 shadow-sm border-start border-5 card-patients">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title fw-normal text-muted mb-0">Total Patients</h5>
+                            <h3 class="display-5 fw-bold" style="color: #2C3E50;">{{ total_patients }}</h3>
+                        </div>
+                        <i class="bi bi-people fs-1 text-primary" style="color: #3498DB !important; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <a href="{% url 'appointment_list' %}" class="text-decoration-none">
+                <div class="card card-hover card-dashboard h-100 shadow-sm border-start border-5 card-appointments">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title fw-normal text-muted mb-0">Total Appointments</h5>
+                            <h3 class="display-5 fw-bold" style="color: #2C3E50;">{{ total_appointments }}</h3>
+                        </div>
+                        <i class="bi bi-calendar-check fs-1 text-primary" style="color: #1ABC9C !important; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <a href="{% url 'appointment_list' %}?status=pending" class="text-decoration-none">
+                <div class="card card-hover card-dashboard h-100 shadow-sm border-start border-5 card-today">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title fw-normal text-muted mb-0">Appointments Today</h5>
+                            <h3 class="display-5 fw-bold" style="color: #2C3E50;">{{ upcoming_appointments|length }}</h3>
+                        </div>
+                        <i class="bi bi-alarm fs-1 text-primary" style="color: #F39C12 !important; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <a href="{% url 'invoice_list' %}" class="text-decoration-none">
+                <div class="card card-hover card-dashboard h-100 shadow-sm border-start border-5 card-invoices">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title fw-normal text-muted mb-0">Total Invoices</h5>
+                            <h3 class="display-5 fw-bold" style="color: #2C3E50;">{{ invoices|length }}</h3>
+                        </div>
+                        <i class="bi bi-receipt fs-1 text-primary" style="color: #E74C3C !important; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    {# --- END MODERNIZED CARD SECTION --- #}
+
+    <h4 class="mb-3 fw-bold" style="color: #2C3E50;">Quick Actions</h4>
+    <div class="row g-3 mb-5">
+        <div class="col-md-3">
+            <a href="{% url 'patient_register' %}" class="btn btn-outline-primary w-100 py-3 shadow-sm">
+                <i class="bi bi-person-plus me-2"></i> Register New Patient
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'book_appointment' %}" class="btn btn-outline-success w-100 py-3 shadow-sm">
+                <i class="bi bi-calendar-plus me-2"></i> Book Appointment
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'create_invoice' %}" class="btn btn-outline-danger w-100 py-3 shadow-sm">
+                <i class="bi bi-file-earmark-plus me-2"></i> Create Invoice
+            </a>
+        </div>
+    </div>
+    
+    <div class="card shadow-lg rounded-3">
+        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center p-4">
+            <h5 class="fw-bold mb-0" style="color: #2C3E50;">Next 5 Upcoming Appointments</h5>
+            <a href="{% url 'appointment_list' %}" class="btn btn-sm btn-outline-secondary">View All</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="p-3">Patient Name</th>
+                        <th class="p-3">Doctor</th>
+                        <th class="p-3">Date</th>
+                        <th class="p-3">Time</th>
+                        <th class="p-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in upcoming_appointments|slice:":5" %}
+                    <tr>
+                        <td class="p-3 fw-bold">{{ appointment.patient.user.get_full_name|default:appointment.patient.user.username|capfirst }}</td>
+                        <td class="p-3">{{ appointment.doctor.user.get_full_name|default:appointment.doctor.user.username|capfirst }}</td>
+                        <td class="p-3">{{ appointment.date }}</td>
+                        <td class="p-3">{{ appointment.time|date:"h:i A" }}</td>
+                        <td class="p-3">
+                            <a href="{% url 'appointment_detail' appointment.id %}" class="btn btn-sm btn-info text-white"style="color:white !important">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted p-4">No upcoming appointments found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

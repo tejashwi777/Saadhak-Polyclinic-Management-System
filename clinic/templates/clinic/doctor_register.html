@@ -1,0 +1,13 @@
+<!-- clinic/templates/clinic/doctor_register.html -->
+{% extends 'clinic/base.html' %}
+{% block content %}
+<h2>Register Doctor</h2>
+<form method="post">
+  {% csrf_token %}
+  <div class="row">
+    <div class="col-md-6">{{ user_form.as_p }}</div>
+    <div class="col-md-6">{{ doctor_form.as_p }}</div>
+  </div>
+  <button class="btn btn-primary">Save</button>
+</form>
+{% endblock %}

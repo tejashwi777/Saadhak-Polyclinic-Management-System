@@ -1,0 +1,36 @@
+{% extends 'clinic/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Edit Appointment{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg rounded-4">
+                <div class="card-header bg-primary text-white text-center rounded-top-4 p-3">
+                    <h4 class="mb-0 fw-bold">Edit Appointment ({{ appointment.id }})</h4>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {{ form|crispy }}
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                Update Appointment
+                            </button>
+                            <a href="{% url 'appointment_detail' appointment.id %}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

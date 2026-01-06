@@ -1,0 +1,16 @@
+<h2>Bill Details</h2>
+
+<p><strong>Patient:</strong> {{ bill.patient }}</p>
+<p><strong>Appointment:</strong> {{ bill.appointment }}</p>
+
+<hr>
+
+<p>Consultation Fee: Rs. {{ bill.consultation_fee }}</p>
+<p>Lab Fee: Rs. {{ bill.lab_fee }}</p>
+<p>Medicine Fee: Rs. {{ bill.medicine_fee }}</p>
+
+<hr>
+
+<h3>Total: Rs. {{ bill.total_amount }}</h3>
+
+<a href="{% url 'billing_list' %}">Back to Bills</a>

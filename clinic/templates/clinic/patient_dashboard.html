@@ -1,0 +1,126 @@
+{% extends 'clinic/base.html' %}
+
+{% block title %}Patient Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <h2 class="display-6 fw-bold mb-5" style="color: #2C3E50;">Welcome, {{ user.username|capfirst }}</h2>
+
+    <div class="row g-5 mb-5">
+        
+        <div class="col-lg-4 col-md-6">
+            <a href="{% url 'appointment_list' %}" class="text-decoration-none">
+                <div class="card card-hover h-100 shadow-lg">
+                    <div class="card-body p-4 position-relative">
+                        <i class="bi-calendar-event card-icon fs-1 position-absolute top-0 end-0 me-3 mt-3 stat-icon"></i>
+                        <div class="d-flex flex-column">
+                            <small class="text-muted text-uppercase fw-bold">Upcoming Appointments</small>
+                            <h3 class="mt-2 display-5 fw-bolder" style="color: #1ABC9C;">{{ upcoming_appointments|length }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <a href="{% url 'prescription_list' %}" class="text-decoration-none">
+                <div class="card card-hover h-100 shadow-lg">
+                    <div class="card-body p-4 position-relative">
+                        <i class="bi-file-medical card-icon fs-1 text-success position-absolute top-0 end-0 me-3 mt-3 stat-icon"></i>
+                        <div class="d-flex flex-column">
+                            <small class="text-muted text-uppercase fw-bold">Total Prescriptions</small>
+                            <h3 class="mt-2 display-5 fw-bolder text-success">{{ prescriptions_count }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <a href="{% url 'labreport_list' %}" class="text-decoration-none">
+                <div class="card card-hover h-100 shadow-lg">
+                    <div class="card-body p-4 position-relative">
+                        <i class="bi-file-earmark-medical card-icon fs-1 text-warning position-absolute top-0 end-0 me-3 mt-3 stat-icon"></i>
+                        <div class="d-flex flex-column">
+                            <small class="text-muted text-uppercase fw-bold">Total Lab Reports</small>
+                            <h3 class="mt-2 display-5 fw-bolder text-warning">{{ labreports_count }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h4 class="mb-4 fw-bold" style="color: #2C3E50;">Quick Access</h4>
+    <div class="row g-4 mb-5">
+        
+        <div class="col-md-4">
+            <a href="{% url 'book_appointment' %}" class="card card-hover text-decoration-none h-100 shadow-sm" style="background-color: #e6fff5; border: 1px solid #ccffed;">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <span class="fw-bold" style="color: #1ABC9C;">Book New Appointment</span>
+                    <i class="bi-calendar-plus fs-2" style="color: #1ABC9C;"></i>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-4">
+            <a href="{% url 'prescription_list' %}" class="card card-hover text-decoration-none h-100 shadow-sm" style="background-color: #e8f3f8; border: 1px solid #cce5ff;">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <span class="fw-bold" style="color: #2C3E50;">View All Prescriptions</span>
+                    <i class="bi-journal-medical fs-2" style="color: #2C3E50;"></i>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-4">
+            <a href="{% url 'labreport_list' %}" class="card card-hover text-decoration-none h-100 shadow-sm" style="background-color: #fff9e6; border: 1px solid #f7e6b8;">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <span class="fw-bold text-warning">Check Recent Lab Reports</span>
+                    <i class="bi-file-earmark-medical fs-2 text-warning"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-lg rounded-4 mt-5">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center p-4">
+            <h5 class="fw-bold mb-0" style="color: #2C3E50;">My Upcoming Appointments</h5>
+            <a href="{% url 'appointment_list' %}" class="btn btn-sm btn-outline-secondary" style="border-color: #2C3E50; color: #2C3E50;">View All</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background-color: #ECF0F1;">
+                    <tr>
+                        <th class="p-3">Doctor</th>
+                        <th class="p-3">Date & Time</th>
+                        <th class="p-3">Symptoms</th>
+                        <th class="p-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in upcoming_appointments %}
+                    <tr>
+                        <td class="p-3 fw-bold">{{ appointment.doctor.user.get_full_name|default:appointment.doctor.user.username|capfirst }}</td>
+                        <td class="p-3">{{ appointment.date }} {{ appointment.time }}</td>
+                        <td class="p-3 text-muted">{{ appointment.symptoms|truncatechars:40 }}</td>
+                        <td class="p-3">
+                            {% if appointment.status|lower == 'pending' %}
+                                <span class="badge-status status-pending">{{ appointment.status|capfirst }}</span>
+                            {% elif appointment.status|lower == 'completed' %}
+                                <span class="badge-status status-completed">{{ appointment.status|capfirst }}</span>
+                            {% elif appointment.status|lower == 'cancelled' %}
+                                <span class="badge-status status-cancelled">{{ appointment.status|capfirst }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center text-muted p-4">You have no upcoming appointments</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

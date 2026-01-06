@@ -1,0 +1,142 @@
+{% extends 'clinic/base.html' %}
+
+{% block title %}Doctor Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h2 class="display-6 fw-bold text-dark">👋 Welcome, {{ user.username|capfirst }}</h2>
+        {# Optional: Add a quick date/time widget here #}
+    </div>
+
+    <div class="row g-5 mb-5"> 
+    
+    <div class="col-lg-3 col-md-6">
+        <a href="{% url 'appointment_list' %}" class="text-decoration-none">
+        <div class="card card-hover h-100 shadow-lg">
+            <div class="card-body p-4 position-relative">
+                <i class="bi-calendar-check fs-1 position-absolute top-0 end-0 me-3 mt-3 stat-icon"></i>
+                <div class="d-flex flex-column">
+                    <small class="text-muted text-uppercase fw-bold">Upcoming Appointments</small>
+                    <h3 class="mt-2 display-5 fw-bolder" style="color: #007BFF;">{{ appointments_count }}</h3>
+                </div>
+                <span class="btn btn-link p-0 mt-3 d-block text-start" style="color: #00A896;">View Schedule &rarr;</span>
+            </div>
+        </div>
+        </a>
+    </div>
+
+    {# 🌟 NEW CARD: UNREAD NOTIFICATIONS #}
+    <div class="col-lg-3 col-md-6">
+        <a href="{% url 'notifications_list' %}" class="text-decoration-none">
+        <div class="card card-hover h-100 shadow-lg">
+            <div class="card-body p-4 position-relative">
+                <i class="bi-bell-fill fs-1 text-danger position-absolute top-0 end-0 me-3 mt-3 stat-icon"></i>
+                <div class="d-flex flex-column">
+                    <small class="text-muted text-uppercase fw-bold">Unread Notifications</small>
+                    <h3 class="mt-2 display-5 fw-bolder text-danger">
+                        {# Display the count fetched from the view #}
+                        {{ unread_notifications|default:0 }}
+                    </h3>
+                </div>
+                <span class="btn btn-link p-0 mt-3 d-block text-start text-danger">Check Alerts &rarr;</span>
+            </div>
+        </div>
+        </a>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <a href="{% url 'prescription_list' %}" class="text-decoration-none">
+        <div class="card card-hover h-100 shadow-lg">
+            <div class="card-body p-4 position-relative">
+                <i class="bi-journal-medical fs-1 text-success position-absolute top-0 end-0 me-3 mt-3 stat-icon"></i>
+                <div class="d-flex flex-column">
+                    <small class="text-muted text-uppercase fw-bold">Total Prescriptions</small>
+                    <h3 class="mt-2 display-5 fw-bolder text-success">{{ prescriptions_count }}</h3>
+                </div>
+                <span class="btn btn-link p-0 mt-3 d-block text-start text-success">Manage Prescriptions &rarr;</span>
+            </div>
+        </div>
+        </a>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <a href="{% url 'labreport_list' %}" class="text-decoration-none">
+        <div class="card card-hover h-100 shadow-lg">
+            <div class="card-body p-4 position-relative">
+                <i class="bi-file-medical fs-1 text-warning position-absolute top-0 end-0 me-3 mt-3 stat-icon"></i>
+                <div class="d-flex flex-column">
+                    <small class="text-muted text-uppercase fw-bold">Lab Reports</small>
+                    <h3 class="mt-2 display-5 fw-bolder text-warning">{{ labreports_count }}</h3>
+                </div>
+                <span class="btn btn-link p-0 mt-3 d-block text-start text-warning">View All Reports &rarr;</span>
+            </div>
+        </div>
+        </a>
+    </div>
+</div>
+
+    <div class="card border-0 shadow-lg mb-5">
+        <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-dark fw-bold">Today's Schedule & Latest Appointments</h5>
+            <a href="{% url 'appointment_list' %}" class="btn btn-sm btn-outline-secondary">View All</a>
+        </div>
+        <div class="card-body table-responsive p-0">
+            {% if upcoming_appointments %}
+            <table class="table table-hover table-borderless align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="p-3">#</th>
+                        <th class="p-3">Patient Name</th>
+                        <th class="p-3">Date</th>
+                        <th class="p-3">Time</th>
+                        <th class="p-3">Status</th>
+                        <th class="p-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in upcoming_appointments|slice:":7" %} 
+                    <tr style="border-bottom: 1px solid #f1f3f5;">
+                        <td class="p-3">{{ forloop.counter }}</td>
+                        <td class="p-3 fw-bold">{{ appointment.patient.user.get_full_name|default:appointment.patient.user.username }}</td>
+                        <td class="p-3 text-muted">{{ appointment.date }}</td>
+                        <td class="p-3 text-muted">{{ appointment.time }}</td>
+                        <td class="p-3">
+                            <span class="badge-status status-{{ appointment.status|lower }}">{{ appointment.status|capfirst }}</span>
+                        </td>
+                        <td class="p-3">
+                            <a href="{% url 'appointment_detail' appointment.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted p-4 mb-0">You have no upcoming appointments scheduled.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <h5 class="mb-4 text-dark fw-bold">Essential Actions</h5>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <a href="{% url 'prescription_list' %}" class="card card-hover text-decoration-none shadow-sm h-100" style="background-color: #e6f5ff; border: 1px solid #cce5ff;">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <span class="fw-bold" style="color: #007BFF;">Write New Prescription</span>
+                    <i class="bi-journal-plus fs-2" style="color: #007BFF;"></i>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a href="{% url 'labreport_upload' %}" class="card card-hover text-decoration-none shadow-sm h-100" style="background-color: #e6fff5; border: 1px solid #ccffed;">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <span class="fw-bold" style="color: #00A896;">Upload Lab Report</span>
+                    <i class="bi-upload fs-2" style="color: #00A896;"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

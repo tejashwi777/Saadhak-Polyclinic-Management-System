@@ -1,0 +1,30 @@
+{% extends 'clinic/base.html' %}
+{% load crispy_forms_tags %}  {# Load crispy forms tags #}
+
+{% block content %}
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h4>Register New Patient</h4>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <!-- User form (username, email, password) -->
+                <div class="col-md-6">
+                    <h5>User Info</h5>
+                    {{ user_form|crispy }}
+                </div>
+
+                <!-- Patient form (full name, phone, etc.) -->
+                <div class="col-md-6">
+                    <h5>Patient Info</h5>
+                    {{ patient_form|crispy }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success mt-3">Register Patient</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

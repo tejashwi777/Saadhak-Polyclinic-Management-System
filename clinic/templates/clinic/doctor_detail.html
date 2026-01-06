@@ -1,0 +1,74 @@
+{% extends 'clinic/base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Doctor Profile: Dr. {{ doctor.user.get_full_name|default:doctor.user.username }}</h2>
+    <a href="{% url 'doctor_list' %}" class="btn btn-secondary">Back to Doctor List</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Doctor Information</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Specialization:</strong> {{ doctor.specialization|default:"N/A" }}</p>
+                <p><strong>Registration ID:</strong> {{ doctor.registration_id|default:"N/A" }}</p>
+                <p><strong>Email:</strong> {{ doctor.user.email }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Phone:</strong> {{ doctor.phone|default:"N/A" }}</p>
+                <p><strong>Experience (Years):</strong> {{ doctor.experience|default:"N/A" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3 class="mt-5">Upcoming Schedule</h3>
+<div class="card card-body mb-5">
+    {% if schedules %}
+        <ul class="list-group">
+            {% for schedule in schedules %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ schedule.day_of_week|default:"Date" }}:</strong> 
+                        {{ schedule.date|default:"N/A" }} 
+                        from {{ schedule.start_time|time:"h:i A" }} to {{ schedule.end_time|time:"h:i A" }}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No available schedule information for this doctor.</p>
+    {% endif %}
+</div>
+
+<h3 class="mt-5">Recent Appointments</h3>
+<div class="card card-body mb-5">
+    {% if appointments %}
+        <ul class="list-group">
+            {% for appointment in appointments|slice:":5" %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <a href="{% url 'appointment_detail' appointment.id %}">
+                            {{ appointment.patient.user.get_full_name|default:appointment.patient.user.username }}
+                        </a>
+                         on {{ appointment.date }} at {{ appointment.time }}
+                    </div>
+                    <span class="badge 
+                        {% if appointment.status == 'Pending' %}bg-warning text-dark{% elif appointment.status == 'Completed' %}bg-success{% else %}bg-danger{% endif %} 
+                        ">{{ appointment.status }}</span>
+                </li>
+            {% endfor %}
+            <li class="list-group-item text-center">
+                <a href="{% url 'appointment_list' %}?doctor={{ doctor.user.username }}" class="btn btn-sm btn-outline-primary">View All Appointments</a>
+            </li>
+        </ul>
+    {% else %}
+        <p>No appointments found for this doctor.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

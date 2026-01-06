@@ -1,0 +1,38 @@
+{% extends 'clinic/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Invoices</h2>
+
+  {% if invoices %}
+    
+    {% for invoice in invoices %}
+      <div class="card mb-3 p-3 shadow-sm">
+        <div class="d-flex justify-content-between">
+            <h5>Invoice #{{ invoice.id }}</h5>
+            <a href="{% url 'invoice_detail' pk=invoice.id %}" class="btn btn-sm btn-outline-primary">View Full Invoice</a>
+        </div>
+        
+        <p><strong>Patient:</strong> {{ invoice.patient }}</p>
+        <p><strong>Date:</strong> {{ invoice.date_created|date:"d M Y" }}</p>
+
+        <h6>Quick Summary:</h6>
+        <ul>
+          {% for item in invoice.items.all %}
+            <li>{{ item.description }} - Rs. {{ item.amount }}</li>
+          {% empty %}
+            <li class="text-muted">No items in this invoice.</li>
+          {% endfor %}
+        </ul>
+        <p class="text-end"><strong>Total: Rs. {{ invoice.get_total_amount }}</strong></p>
+      </div>
+    {% endfor %}
+
+  {% else %}
+    <div class="alert alert-info">
+        No invoices found in the system.
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appointment Notification</title>
+<style>
+    body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 20px auto; background-color: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .header { background-color: #0d6efd; color: #fff; padding: 20px; text-align: center; }
+    .header img { max-width: 120px; margin-bottom: 10px; }
+    .content { padding: 20px; color: #333; }
+    .content h2 { color: #0d6efd; margin-top: 0; }
+    .appointment { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 10px; }
+    .appointment p { margin: 5px 0; }
+    .btn { display: inline-block; padding: 10px 20px; background-color: #0d6efd; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 15px; }
+    .footer { font-size: 0.85rem; text-align: center; color: #777; padding: 15px; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <img src="https://yourclinic.com/logo.png" alt="Clinic Logo">
+        <h1>Saadhak Polyclinic</h1>
+    </div>
+    <div class="content">
+        <h2>Hello {{ user_name }},</h2>
+        <p>You have upcoming appointment(s) at Saadhak Polyclinic. Here are the details:</p>
+
+        {% for appointment in appointments %}
+        <div class="appointment">
+            <p><strong>Date:</strong> {{ appointment.date }}</p>
+            <p><strong>Time:</strong> {{ appointment.time }}</p>
+            <p><strong>Doctor:</strong> {{ appointment.doctor_name }}</p>
+            <p><strong>Notes:</strong> {{ appointment.notes|default:"-" }}</p>
+        </div>
+        {% endfor %}
+
+        <a href="{{ portal_link }}" class="btn">View Appointments</a>
+    </div>
+    <div class="footer">
+        Saadhak Polyclinic | Contact: +977-123456789 | support@saadhakclinic.com
+    </div>
+</div>
+</body>
+</html>

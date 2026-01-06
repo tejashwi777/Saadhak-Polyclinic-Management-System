@@ -1,0 +1,10 @@
+<!-- clinic/templates/clinic/book_appointment.html -->
+{% extends 'clinic/base.html' %}
+{% block content %}
+<h2>Book Appointment</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="btn btn-primary">Book</button>
+</form>
+{% endblock %}

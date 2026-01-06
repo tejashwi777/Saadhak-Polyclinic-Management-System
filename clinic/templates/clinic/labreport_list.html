@@ -1,0 +1,18 @@
+{% extends 'clinic/base.html' %}
+{% block content %}
+<h2>Lab Reports</h2>
+<ul class="list-group">
+  {% for r in reports %}
+    <li class="list-group-item">
+      {{ r.uploaded_at }} - {{ r.patient.user.username }} - <a href="{{ r.report_file.url }}">Download</a>
+    </li>
+  {% empty %}
+    <li class="list-group-item">No lab reports.</li>
+  {% endfor %}
+</ul>
+{% if invoice_pdf %}
+<a href="{% url 'invoice_pdf' invoice.id %}" class="btn btn-sm btn-danger">
+    Download PDF
+</a>
+{% endif %}
+{% endblock %}

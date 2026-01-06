@@ -1,0 +1,58 @@
+{% extends 'clinic/base.html' %}
+
+{% block title %}All System Users{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="display-6 fw-bold mb-4" style="color: #2C3E50;">System Users Overview</h2>
+    <p class="text-muted mb-4">Monitor all user accounts registered in the polyclinic system.</p>
+
+    <div class="card shadow-lg rounded-4 border-0">
+        <div class="card-header bg-white border-0 p-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0" style="color: #2C3E50;">Registered Users ({{ all_users.count }})</h5>
+            </div>
+        <div class="table-responsive">
+            {% if all_users %}
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background-color: #ECF0F1;">
+                    <tr>
+                        <th class="p-3">Username</th>
+                        <th class="p-3">Email</th>
+                        <th class="p-3">Staff/Role</th>
+                        <th class="p-3 text-center">Status</th>
+                        <th class="p-3">Joined</th>
+                        </tr>
+                </thead>
+                <tbody>
+                    {% for user in all_users %}
+                    <tr>
+                        <td class="p-3 fw-bold text-primary">{{ user.username }}</td>
+                        <td class="p-3 text-muted">{{ user.email|default:'N/A' }}</td>
+                        <td class="p-3">
+                            {% if user.is_superuser %}
+                                <span class="badge bg-danger">Super Admin</span>
+                            {% else %}
+                                <span class="badge bg-info text-dark">{{ user.role|capfirst }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-3 text-center">
+                            {% if user.is_active %}
+                                <span class="badge rounded-pill bg-success-subtle text-success px-3">Active</span>
+                            {% else %}
+                                <span class="badge rounded-pill bg-warning-subtle text-warning px-3">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-3 small text-muted">{{ user.date_joined|date:"M d, Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="text-center p-5">
+                <p class="text-muted mb-0">No users found in the system.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends 'clinic/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+     {% if user.role == 'receptionist' %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Appointments</h2>
+        <a class="btn btn-outline-success" href="{% url 'book_appointment' %}">
+            <i class="bi bi-calendar-plus"></i> Book Appointment
+        </a>
+    </div>
+     {% endif %}
+
+
+    <!-- Calendar -->
+    <div id="calendar" class="mb-5"></div>
+
+    <!-- Table fallback -->
+    <h3>All Appointments</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in appointments %}
+                <tr>
+                    <td>{{ a.patient.user.get_full_name|default:a.patient.user.username }}</td>
+                    <td>{{ a.doctor.user.get_full_name|default:a.doctor.user.username }}</td>
+                    <td>{{ a.date }}</td>
+                    <td>{{ a.time }}</td>
+                    
+                    <td class="p-3">
+                        <span class="badge-status 
+                            {% if a.status|lower == 'pending' %}status-pending
+                            {% elif a.status|lower == 'completed' %}status-completed
+                            {% elif a.status|lower == 'cancelled' %}status-cancelled
+                            {% else %}status-default{% endif %}">
+                            {{ a.status|capfirst }}
+                        </span>
+                    </td>
+                    
+                    <td class="p-3">
+                        <a href="{% url 'appointment_detail' a.id %}" class="btn btn-sm btn-primary" style="color: white !important;">View</a>
+
+                        {% if user.role == 'receptionist' or user == a.doctor.user or user.role == 'admin' %}
+                            <a href="{% url 'delete_appointment' a.id %}"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Are you sure you want to delete this appointment?');">
+                               Delete
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center">No appointments.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- FullCalendar -->
+   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+
+    <script id="appointments-data" type="application/json">
+[
+  {% for a in appointments %}
+    {% with status=a.status|lower %}
+      {% if status == 'pending' %}{% with color='#ffc107' %}{% endwith %}
+      {% elif status == 'confirmed' %}{% with color='#17a2b8' %}{% endwith %}
+      {% elif status == 'completed' %}{% with color='#28a745' %}{% endwith %}
+      {% elif status == 'cancelled' %}{% with color='#dc3545' %}{% endwith %}
+      {% else %}{% with color='#6c757d' %}{% endwith %}
+      {% endif %}
+    {
+      "title": "{{ a.patient.user.get_full_name|default:a.patient.user.username }} - {{ a.doctor.user.get_full_name|default:a.doctor.user.username }}",
+      "start": "{{ a.date }}T{{ a.time|time:'H:i:s' }}",
+      "url": "{% url 'appointment_detail' a.id %}",
+      
+      "backgroundColor": "{{ color }}",
+      "borderColor": "{{ color }}"
+      
+    }{% if not forloop.last %},{% endif %}
+    {% endwith %}
+  {% endfor %}
+]
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var appointments = JSON.parse(document.getElementById('appointments-data').textContent);
+        
+        // --- 1. Fetch Schedule Data (AJAX) ---
+        fetch("{% url 'get_calendar_events' %}") // Assuming you set a URL name 'get_calendar_events'
+            .then(response => response.json())
+            .then(scheduleEvents => {
+                
+                // --- 2. Combine all events ---
+                var allEvents = appointments.concat(scheduleEvents);
+
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    navLinks: true, // can click day/week names to navigate views
+                    editable: false,
+                    selectable: true,
+                    // Use the combined list of appointments and schedules
+                    events: allEvents, 
+                    
+                    eventClick: function(info) {
+                        // Only redirect if it's a foreground appointment event (not a background schedule block)
+                        if (info.event.url) {
+                            window.location.href = info.event.url;
+                        }
+                    },
+                });
+
+                calendar.render();
+            })
+            .catch(error => {
+                console.error('Error fetching calendar data:', error);
+            });
+    });
+</script>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'clinic/base.html' %}
+{% block content %}
+<h2>Messages</h2>
+<h5>Received</h5>
+<ul class="list-group mb-3">
+  {% for m in received %}
+    <li class="list-group-item"><strong>{{ m.subject }}</strong> from {{ m.sender.username }} — {{ m.timestamp }}</li>
+  {% empty %}
+    <li class="list-group-item">No messages.</li>
+  {% endfor %}
+</ul>
+
+<h5>Sent</h5>
+<ul class="list-group">
+  {% for m in sent %}
+    <li class="list-group-item"><strong>{{ m.subject }}</strong> to {{ m.receiver.username }} — {{ m.timestamp }}</li>
+  {% empty %}
+    <li class="list-group-item">No sent messages.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,343 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Polyclinic{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"> 
+    
+    <style>
+        /* Define your core colors for consistency */
+        :root {
+            --primary-aqua: #1ABC9C;
+            --secondary-blue: #2C3E50;
+        }
+
+        /* --- GENERAL SETUP --- */
+        body { 
+            background-color: #ECF0F1; /* Light Pale Grey Background */
+            font-family: 'Arial', sans-serif;
+        }
+        h2 { 
+            font-weight: 700; 
+            color: var(--secondary-blue); 
+        }
+        
+        /* Global primary button/link color */
+        .text-primary, .btn-primary {
+            color: var(--primary-aqua) !important; 
+        }
+        .btn-primary {
+            background-color: var(--primary-aqua) !important;
+            border-color: var(--primary-aqua) !important;
+        }
+        
+        /* Subtle background utility class for icons */
+        .stat-icon {
+            opacity: 0.1; 
+            color: var(--primary-aqua) !important; 
+        }
+        
+        /* --- SIDEBAR (NAV) - TRUSTWORTHY BLUE --- */
+        .sidebar { 
+            min-height: 100vh; 
+            background-color: var(--secondary-blue); 
+            padding-top: 1rem; 
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2); 
+        }
+        .sidebar h5 {
+            color: #fff !important; 
+        }
+        .sidebar a { 
+            color: #ECF0F1; 
+            display: block; 
+            padding: 12px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            margin-bottom: 6px; 
+            transition: all 0.2s; 
+        }
+        .sidebar a:hover { 
+            background-color: #34495E; 
+            color: #fff;
+        }
+        .sidebar a.active { 
+            background-color: var(--primary-aqua) !important; 
+            color: #fff !important; 
+            font-weight: bold;
+        }
+
+        /* --- TOP BAR (Layout for Alignment is in HTML) --- */
+        .topbar { 
+            background-color: #fff; 
+            height: 60px; 
+            display: flex; 
+            justify-content: flex-end; 
+            align-items: center; 
+            padding: 0 20px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+        }
+        .topbar .btn-outline-secondary {
+            border-color: var(--secondary-blue); 
+            color: var(--secondary-blue);
+        }
+
+        /* --- CARDS & HOVER EFFECT --- */
+        .card {
+            border-radius: 12px;
+            border: none; 
+            background-color: #fff; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05); 
+        }
+        .card-hover:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15); 
+            border-bottom: 3px solid var(--primary-aqua); 
+        }
+        
+        /* --- TABLE & BADGE STYLES --- */
+        .table-responsive { 
+            background: #fff; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            border: 1px solid #ECF0F1;
+        }
+        .table thead {
+            background-color: #ECF0F1; 
+        }
+        
+        /* Common Badge base style */
+        .badge-status { 
+            padding: 0.5em 0.75em; 
+            border-radius: 0.5rem; /* Using 0.5rem for modern look */
+            font-size: 0.75rem; 
+            font-weight: 700; 
+            display: inline-block;
+        }
+        
+        /* 1. PENDING (Warning/Yellow) */
+        .status-pending { 
+            background-color: #FFEDCC; /* Light Yellow */
+            color: #997404; /* Darker Yellow/Brown Text */
+            border: 1px solid #FFDA80;
+        }
+        
+        /* 2. COMPLETED (Success/Green) */
+        .status-completed { 
+            background-color: #D1E7DD; /* Light Green */
+            color: #0F5132; /* Dark Green Text */
+            border: 1px solid #BADBCC;
+        }
+        
+        /* 3. CANCELLED (Danger/Red) */
+        .status-cancelled { 
+            background-color: #F8D7DA; /* Light Red */
+            color: #842029; /* Dark Red Text */
+            border: 1px solid #F5C2C7;
+        }
+        
+    </style>
+    
+</head>
+<body>
+
+<div class="d-flex">
+    <div class="d-flex flex-column flex-shrink-0 p-3 text-white sidebar" style="width: 250px;">
+        <a href="{% if user.is_authenticated %}{% if user.role == 'admin' %}{% url 'admin_dashboard' %}{% elif user.role == 'doctor' %}{% url 'doctor_dashboard' %}{% elif user.role == 'receptionist' %}{% url 'receptionist_dashboard' %}{% else %}{% url 'patient_dashboard' %}{% endif %}{% else %}/{% endif %}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+            <i class="bi-hospital fs-4 me-2"></i>
+            <h5 class="fs-5 fw-bold">Saadhak Polyclinic</h5>
+        </a>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+            {% if user.is_authenticated %}
+
+                {# --- ADMIN LINKS --- #}
+                {% if user.role == 'admin' %}
+                <li>
+                    <a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                        <i class="bi-speedometer2 me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'patient_list' %}" class="nav-link {% if 'patient_list' in request.path %}active{% endif %}">
+                        <i class="bi-people me-2"></i>Patients
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'doctor_list' %}" class="nav-link {% if 'doctor_list' in request.path %}active{% endif %}">
+                        <i class="bi-person-badge me-2"></i>Doctors
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'appointment_list' %}" class="nav-link {% if 'appointment' in request.path %}active{% endif %}">
+                        <i class="bi-calendar-check me-2"></i>Appointments
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'invoice_list' %}" class="nav-link {% if 'invoice' in request.path %}active{% endif %}">
+                        <i class="bi-receipt me-2"></i>Invoices
+                    </a>
+                </li>
+
+                {# --- DOCTOR LINKS --- #}
+                {% elif user.role == 'doctor' %}
+                <li>
+                    <a href="{% url 'doctor_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'doctor_dashboard' %}active{% endif %}">
+                        <i class="bi-speedometer2 me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'appointment_list' %}" class="nav-link {% if 'appointment' in request.path %}active{% endif %}">
+                        <i class="bi-calendar-check me-2"></i>Appointments
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'prescription_list' %}" class="nav-link {% if 'prescription' in request.path %}active{% endif %}">
+                        <i class="bi-journal-medical me-2"></i>Prescriptions
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'labreport_list' %}" class="nav-link {% if 'labreport' in request.path and not 'upload' in request.path %}active{% endif %}">
+                        <i class="bi-file-medical me-2"></i>Lab Reports
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'labreport_upload' %}" class="nav-link {% if 'labreport/upload' in request.path %}active{% endif %}">
+                        <i class="bi-upload me-2"></i>Upload Lab Report
+                    </a>
+                </li>
+                
+                {# --- RECEPTIONIST LINKS --- #}
+                {% elif user.role == 'receptionist' %}
+                <li>
+                    <a href="{% url 'receptionist_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'receptionist_dashboard' %}active{% endif %}">
+                        <i class="bi-speedometer2 me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'patient_list' %}" class="nav-link {% if 'patient_list' in request.path %}active{% endif %}">
+                        <i class="bi-people me-2"></i>Patients
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'appointment_list' %}" class="nav-link {% if 'appointment' in request.path %}active{% endif %}">
+                        <i class="bi-calendar-check me-2"></i>Appointments
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'invoice_list' %}" class="nav-link {% if 'invoice' in request.path %}active{% endif %}">
+                        <i class="bi-receipt me-2"></i>Invoices
+                    </a>
+                </li>
+                {# --- PATIENT LINKS --- #}
+                {% elif user.role == 'patient' %}
+                <li>
+                    <a href="{% url 'patient_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'patient_dashboard' %}active{% endif %}">
+                        <i class="bi-speedometer2 me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'appointment_list' %}" class="nav-link {% if 'appointment' in request.path %}active{% endif %}">
+                        <i class="bi-calendar-check me-2"></i>My Appointments
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'prescription_list' %}" class="nav-link {% if 'prescription' in request.path %}active{% endif %}">
+                        <i class="bi-journal-medical me-2"></i>My Prescriptions
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'labreport_list' %}" class="nav-link {% if 'labreport' in request.path %}active{% endif %}">
+                        <i class="bi-file-earmark-medical me-2"></i>My Lab Reports
+                    </a>
+                </li>  
+                
+                {% endif %}
+            {% endif %}
+
+        </ul>
+        <hr>
+        
+        {# --- USER PROFILE DISPLAY (Corrected: Profile link now functional, Settings link removed) --- #}
+        {% if user.is_authenticated %}
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi-person-circle fs-5 me-2"></i>
+                <strong>
+                    {% if user.role == 'doctor' %}Dr. {% endif %}
+                    {{ user.first_name|default:user.username|capfirst }}
+                </strong>
+                <small class="ms-auto badge bg-info">{{ user.role|capfirst }}</small>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                
+                {# CORRECTED PROFILE LINK #}
+                <li><a class="dropdown-item" href="
+                    {% if user.role == 'admin' %}{% url 'admin_profile' %}
+                    {% elif user.role == 'doctor' %}{% url 'doctor_profile' %}
+                    {% elif user.role == 'receptionist' %}{% url 'receptionist_profile' %}
+                    {% else %}{% url 'patient_self_profile' %}
+                    {% endif %}
+                ">Profile</a></li>
+                
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'user_logout' %}">Sign out</a></li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="flex-grow-1">
+        
+        <nav class="topbar">
+            {% if user.is_authenticated %}
+            
+            <div class="d-flex align-items-center gap-3">
+                
+                {% if user.role == "doctor" or user.role == "receptionist" %}
+                <div class="btn-notification">
+                    <a class="btn btn-outline-secondary position-relative" href="{% url 'notifications_list' %}" style="border-color: #1ABC9C; color: #1ABC9C; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi-bell"></i>
+                        {% with user_notifications=messages.count %}
+                            {% if user_notifications > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ user_notifications }}</span>
+                            {% endif %}
+                        {% endwith %}
+                    </a>
+                </div>
+                {% endif %}
+                
+                <a class="btn btn-outline-secondary" href="{% url 'user_logout' %}" style="border-color: #2C3E50; color: #2C3E50;"><i class="bi-box-arrow-right"></i> Logout</a>
+            </div>
+            
+            {% endif %}
+        </nav>
+
+        <main class="p-4">
+            {% if messages %}
+            <div class="container-fluid">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

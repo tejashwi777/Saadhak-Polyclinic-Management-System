@@ -1,0 +1,125 @@
+{% extends 'clinic/base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Patient Record: {{ patient.user.get_full_name|default:patient.user.username }}</h2>
+    <a href="{% url 'patient_list' %}" class="btn btn-secondary">Back to Patient List</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Patient Information</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Username:</strong> {{ patient.user.username }}</p>
+                <p><strong>Email:</strong> {{ patient.user.email }}</p>
+                <p><strong>Phone:</strong> {{ patient.phone }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Gender:</strong> {{ patient.gender }}</p>
+                <p><strong>Date of Birth:</strong> {{ patient.dob }}</p>
+                <p><strong>Address:</strong> {{ patient.address|default:"N/A" }}</p>
+            </div>
+        </div>
+        <div class="mt-3">
+            <a href="{% url 'patient_profile' patient.id %}" class="btn btn-sm btn-info text-white">Edit Profile</a>
+        </div>
+    </div>
+</div>
+
+<h3 class="mt-5">Appointments History</h3>
+<div class="card card-body mb-5">
+    {% if appointments %}
+        <ul class="list-group">
+            {% for appointment in appointments %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <a href="{% url 'appointment_detail' appointment.id %}">
+                            Dr. {{ appointment.doctor.user.get_full_name }}
+                        </a>
+                         - {{ appointment.date }} at {{ appointment.time }}
+                    </div>
+                    
+                    <span class="badge 
+                        {% if appointment.status == 'Pending' %}bg-warning{% elif appointment.status == 'Completed' %}bg-success{% else %}bg-danger{% endif %} 
+                        text-dark">{{ appointment.status }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No appointments found for this patient.</p>
+    {% endif %}
+</div>
+
+
+<h3 class="mt-4">Prescriptions</h3>
+<div class="card card-body mb-5">
+    {% if prescriptions %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Doctor</th>
+                        <th>Details</th>
+                        <th>View</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in prescriptions %}
+                    <tr>
+                        <td>{{ p.appointment.date|date:"M d, Y" }}</td> 
+                        <td>Dr. {{ p.appointment.doctor.user.get_full_name }}</td>
+                        <td>
+                            <p><strong>Medicine:</strong> {{ p.medicine|default:"N/A" }}</p>
+                            <p><strong>Instructions:</strong> {{ p.instructions|default:"N/A" }}</p>
+                        </td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline-secondary">Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No prescriptions found for this patient.</p>
+    {% endif %}
+</div>
+
+
+<h3 class="mt-4">Lab Reports</h3>
+<div class="card card-body mb-5">
+    {% if lab_reports %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date Uploaded</th>
+                        <th>Doctor</th>
+                        <th>File</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in lab_reports %}
+                    <tr>
+                        <td>{{ report.uploaded_at|date:"M d, Y P" }}</td> 
+                        <td>Dr. {{ report.doctor.user.get_full_name }}</td>
+                        <td>
+                            <a href="{{ report.report_file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">View/Download</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No lab reports found for this patient.</p>
+    {% endif %}
+</div>
+
+
+{% endblock %}

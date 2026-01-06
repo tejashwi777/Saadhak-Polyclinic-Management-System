@@ -1,0 +1,16 @@
+{% extends 'clinic/base.html' %}
+{% block title %}Patient Profile{% endblock %}
+
+{% block content %}
+<h2>Patient Profile — {{ patient.user.username }}</h2>
+<hr>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  
+  <button class="btn btn-primary mt-3" type="submit" style="color: white !important;">
+      Save Changes
+  </button>
+  
+</form>
+{% endblock %}
