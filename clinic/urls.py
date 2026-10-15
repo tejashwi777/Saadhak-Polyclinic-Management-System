@@ -5,17 +5,22 @@ from . import views
 from django.contrib.auth import views as auth_views
 
 
-# In clinic/urls.py, modify the first two login paths:
 
 urlpatterns = [
-    # --- ADMIN LOGIN ---
-path('clinic-admin-login/', views.admin_login, name='admin_login'),    
-    # --- MAIN LOGIN (Patient, Doctor, Receptionist) ---
-    path('', views.user_login, name='login'),                    # Default (Root) path
-    path('login/', views.user_login, name='user_login'),         # Secondary /login/ path
+    # 1. THE ROOT (Homepage)
+    path('', views.home_page, name='home'),
+
+    # 2. THE LOGIN PATHS (Give them distinct URLs)
+    path('clinic-admin-login/', views.admin_login, name='admin_login'),    
+    path('login/', views.user_login, name='user_login'), # This is your main login
     
+    # Use 'login' as a shortcut name for 'user_login' if you want
+    path('signin/', views.user_login, name='login'), 
+
     path('register/', views.register_user, name='register_user'),
     path('logout/', views.user_logout, name='user_logout'),
+    
+
     
 
     # 🌟 NEW: PASSWORD RESET PATHS 🌟

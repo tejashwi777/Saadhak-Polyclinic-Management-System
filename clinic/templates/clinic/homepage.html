@@ -1,0 +1,173 @@
+{% extends 'clinic/base.html' %}
+{% load static %}
+
+{% block title %}Saadhak Polyclinic - Elite Digital Healthcare Management{% endblock %}
+
+{% block content %}
+
+    <header class="hero-section text-center py-5" style="background-color: #e9f0f9; padding-top: 10rem !important; padding-bottom: 10rem !important;">
+        <div class="container">
+            <h1 class="display-3 fw-bolder mb-3 text-dark">
+                Elevating Your Health <span class="text-accent-blue">Experience</span>.
+            </h1>
+            <p class="lead mb-5 text-secondary mx-auto" style="max-width: 800px;">
+                Access leading specialists, instant, secure lab results, and manage every aspect of your healthcare journey with unparalleled ease and confidence.
+            </p>
+            
+            {% if user.is_authenticated %}
+                <a href="{% url 'book_appointment' %}" class="btn btn-accent-blue btn-lg rounded-pill shadow-lg px-5 py-3 me-3 fw-bold text-uppercase">
+                    <i class="bi bi-calendar-check me-2"></i> Book Appointment
+                </a>
+            {% else %}
+                <a href="{% url 'register_user' %}" class="btn btn-success-bright btn-lg rounded-pill shadow-lg px-5 py-3 me-3 fw-bold text-uppercase">
+                    <i class="bi bi-person-plus me-2"></i> Get Started Today
+                </a>
+                <a href="{% url 'user_login' %}" class="btn btn-outline-dark btn-lg rounded-pill px-4 py-3 fw-bold">
+                    Sign In
+                </a>
+            {% endif %}
+        </div>
+    </header>
+
+    <section class="py-4 bg-white border-top border-bottom">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-4 mb-3 mb-md-0 border-end border-light">
+                    <h3 class="fw-bolder fs-2 text-accent-blue">25+</h3>
+                    <p class="mb-0 text-muted">Specialist Doctors</p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0 border-end border-light">
+                    <h3 class="fw-bolder fs-2 text-accent-blue">10K+</h3>
+                    <p class="mb-0 text-muted">Digital Records Secured</p>
+                </div>
+                <div class="col-md-4">
+                    <h3 class="fw-bolder fs-2 text-accent-blue">98%</h3>
+                    <p class="mb-0 text-muted">Patient Satisfaction</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5" style="background-color: #f4f8fc;">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-2 text-dark">Our Integrated Digital Services</h2>
+            <p class="text-center text-secondary mb-5 mx-auto" style="max-width: 600px;">
+                Experience healthcare where expertise meets unparalleled digital convenience.
+            </p>
+
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card service-card border-0 shadow-sm h-100 p-4 text-center">
+                        <div class="icon-circle bg-accent-blue-faint text-accent-blue mx-auto mb-3">
+                            <i class="bi bi-person-badge-fill fs-3"></i>
+                        </div>
+                        <h4 class="card-title fw-bold">Expert Consults</h4>
+                        <p class="card-text text-muted">Connect with leading specialists for precise diagnoses and treatment plans.</p>
+                        <a href="{% url 'doctor_list' %}" class="card-link mt-auto text-accent-blue fw-bold">View Team <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card service-card border-0 shadow-sm h-100 p-4 text-center">
+                        <div class="icon-circle bg-success-faint text-success-bright mx-auto mb-3">
+                            <i class="bi bi-file-earmark-medical-fill fs-3"></i>
+                        </div>
+                        <h4 class="card-title fw-bold">Instant Reports</h4>
+                        <p class="card-text text-muted">Securely receive lab and diagnostic results immediately upon completion.</p>
+                        <a href="{% url 'user_login' %}" class="card-link mt-auto text-success-bright fw-bold">Access Records <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card service-card border-0 shadow-sm h-100 p-4 text-center">
+                        <div class="icon-circle bg-info-faint text-info-bright mx-auto mb-3">
+                            <i class="bi bi-calendar-check-fill fs-3"></i>
+                        </div>
+                        <h4 class="card-title fw-bold">Simple Booking</h4>
+                        <p class="card-text text-muted">Effortlessly schedule, modify, and track all your appointments online.</p>
+                        <a href="{% url 'book_appointment' %}" class="card-link mt-auto text-info-bright fw-bold">Manage Visits <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0 order-lg-2">
+                    <img src="{% static 'img/app_dashboard_mockup.svg' %}" alt="Patient Dashboard Mockup" class="img-fluid rounded-4 shadow-lg border border-3 border-light">
+                </div>
+                <div class="col-lg-6 order-lg-1">
+                    <h2 class="fw-bold mb-3 text-dark">A Secure, Intuitive Patient Dashboard.</h2>
+                    <p class="lead text-secondary mb-4">
+                        Our encrypted portal provides you with secure access to your medical history, prescriptions, and lab reports, ensuring privacy and control over your data.
+                    </p>
+                    <a href="{% url 'user_login' %}" class="btn btn-accent-blue btn-lg px-5 py-3 rounded-pill text-uppercase">
+                        Access Your Portal
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock content %}
+
+
+{% block extra_css %}
+<style>
+    /* DEFINING THE SOPHISTICATED, BALANCED COLOR PALETTE */
+    :root {
+        --bs-accent-blue: #007bff; /* Primary Action Blue */
+        --bs-success-bright: #28a745; /* Trust Green */
+        --bs-info-bright: #17a2b8;    /* Modern Cyan */
+    }
+
+    /* Custom Utility Classes */
+    .text-accent-blue { color: var(--bs-accent-blue) !important; }
+    .text-success-bright { color: var(--bs-success-bright) !important; }
+    .text-info-bright { color: var(--bs-info-bright) !important; }
+    
+    .btn-accent-blue { 
+        background-color: var(--bs-accent-blue); 
+        border-color: var(--bs-accent-blue); 
+        color: white;
+    }
+    .btn-success-bright { 
+        background-color: var(--bs-success-bright); 
+        border-color: var(--bs-success-bright); 
+        color: white;
+    }
+
+    /* Faint Backgrounds for Icons */
+    .bg-accent-blue-faint { background-color: rgba(0, 123, 255, 0.1) !important; }
+    .bg-success-faint { background-color: rgba(40, 167, 69, 0.08) !important; }
+    .bg-info-faint { background-color: rgba(23, 162, 184, 0.08) !important; }
+
+    /* ICON CIRCLE STYLE */
+    .icon-circle {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    /* SERVICE CARD HOVER EFFECT - Floating White Cards */
+    .service-card {
+        border-radius: 15px; 
+        transition: all 0.3s ease;
+        border: 1px solid #e9f0f9 !important; /* Extremely light border to match BG */
+    }
+
+    .service-card:hover {
+        transform: translateY(-5px); 
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important; /* Stronger shadow for floating effect */
+    }
+    
+    /* ROUNDED BUTTONS */
+    .rounded-pill {
+        border-radius: 50rem !important;
+    }
+</style>
+{% endblock extra_css %}

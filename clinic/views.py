@@ -136,7 +136,7 @@ def register_user(request):
             Patient.objects.create(user=user, date_of_birth=dob) #
             
             messages.success(request, 'Registration successful! Please log in.')
-            return redirect('login')
+            return redirect('user_login')
         
         else:
             messages.error(request, 'Error during registration. Please check the fields.')
@@ -1092,3 +1092,7 @@ def patient_profile_view(request):
         'form': form,
         'patient': patient
     })
+
+def home_page(request):
+    # This renders the new, beautiful homepage
+    return render(request, 'clinic/homepage.html')

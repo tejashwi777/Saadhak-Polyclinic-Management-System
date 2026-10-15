@@ -151,7 +151,7 @@
 
 <div class="d-flex">
     <div class="d-flex flex-column flex-shrink-0 p-3 text-white sidebar" style="width: 250px;">
-        <a href="{% if user.is_authenticated %}{% if user.role == 'admin' %}{% url 'admin_dashboard' %}{% elif user.role == 'doctor' %}{% url 'doctor_dashboard' %}{% elif user.role == 'receptionist' %}{% url 'receptionist_dashboard' %}{% else %}{% url 'patient_dashboard' %}{% endif %}{% else %}/{% endif %}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+        <a href="{% url 'home' %}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
             <i class="bi-hospital fs-4 me-2"></i>
             <h5 class="fs-5 fw-bold">Saadhak Polyclinic</h5>
         </a>
@@ -297,29 +297,47 @@
     
     <div class="flex-grow-1">
         
-        <nav class="topbar">
-            {% if user.is_authenticated %}
-            
-            <div class="d-flex align-items-center gap-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top border-bottom">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold text-primary-light" href="{% url 'home' %}">
+            <i class="bi bi-heart-pulse-fill me-2"></i> Saadhak Polyclinic
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto"> 
                 
-                {% if user.role == "doctor" or user.role == "receptionist" %}
-                <div class="btn-notification">
-                    <a class="btn btn-outline-secondary position-relative" href="{% url 'notifications_list' %}" style="border-color: #1ABC9C; color: #1ABC9C; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                        <i class="bi-bell"></i>
-                        {% with user_notifications=messages.count %}
-                            {% if user_notifications > 0 %}
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ user_notifications }}</span>
-                            {% endif %}
-                        {% endwith %}
+                {% if not user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-dark me-2 px-4 rounded-pill fw-bold" href="{% url 'user_login' %}">
+                        Login
                     </a>
-                </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-primary-light text-white px-4 rounded-pill fw-bold" href="{% url 'register_user' %}">
+                        Register
+                    </a>
+                </li>
+                {% else %}
+<li class="nav-item">
+    <a class="nav-link text-primary-light fw-bold me-3" href="{% if user.role == 'admin' %}{% url 'admin_dashboard' %}{% elif user.role == 'doctor' %}{% url 'doctor_dashboard' %}{% elif user.role == 'receptionist' %}{% url 'receptionist_dashboard' %}{% else %}{% url 'patient_dashboard' %}{% endif %}">
+        <i class="bi bi-person-circle me-1"></i> Dashboard
+    </a>
+</li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-danger px-3 rounded-pill" href="{% url 'user_logout' %}">
+                        Logout
+                    </a>
+                </li>
                 {% endif %}
-                
-                <a class="btn btn-outline-secondary" href="{% url 'user_logout' %}" style="border-color: #2C3E50; color: #2C3E50;"><i class="bi-box-arrow-right"></i> Logout</a>
-            </div>
-            
-            {% endif %}
-        </nav>
+
+            </ul>
+        </div>
+    </div>
+</nav>
 
         <main class="p-4">
             {% if messages %}
